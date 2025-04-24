@@ -2916,7 +2916,7 @@ class RespondentsMarketplace:
         # Инициализация расширенного генератора респондентов
         self.enhanced_respondent = EnhancedFinancialRespondent(self)
 
-    @st.cache_data
+    
     def generate_persona(self, weighted: bool = True) -> Dict:
         """
         Генерация случайной персоны с уровнем финансовой грамотности
