@@ -7,7 +7,7 @@ Original file is located at
     https://colab.research.google.com/drive/1oDKXwhFHCE3Y0gEvoRCMfg3uVkBmuzQX
 """
 
-!pip install ipywidgets pandas numpy matplotlib seaborn anthropic openai nltk scikit-learn spacy
+#!pip install ipywidgets pandas numpy matplotlib seaborn anthropic openai nltk scikit-learn spacy
 
 import streamlit as st
 import pandas as pd
