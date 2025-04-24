@@ -4694,8 +4694,11 @@ def main():
 
         if questions_file is not None:
             try:
-                # Создаем временный экземпляр маркетплейса для загрузки вопросов
-                temp_marketplace = RespondentsMarketplace("temp_key")
+                # Создаем временный экземпляр маркетплейса без инициализации клиента
+                temp_marketplace = RespondentsMarketplace(None)
+                # Обходим проверку ключа API
+                temp_marketplace.client_claude = None
+                temp_marketplace.client_openai = None
                 questions = temp_marketplace.load_questions(questions_file)
                 st.session_state.questions = questions
                 st.success(f"Загружено {len(questions)} вопросов")
