@@ -41,6 +41,14 @@ from sklearn.decomposition import LatentDirichletAllocation
 import warnings
 warnings.filterwarnings('ignore')
 
+# Первая команда Streamlit в файле
+st.set_page_config(
+    page_title="Synthetica Financial: Симулятор финансовых респондентов",
+    page_icon="💰", 
+    layout="wide", 
+    initial_sidebar_state="expanded"
+)
+
 # Загрузка необходимых ресурсов NLTK
 @st.cache_resource
 def load_nltk_resources():
