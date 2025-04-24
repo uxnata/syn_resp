@@ -4693,18 +4693,19 @@ def main():
         )
 
         if questions_file is not None:
-            try:
-                # Создаем временный экземпляр маркетплейса без инициализации клиента
-                temp_marketplace = RespondentsMarketplace(None)
-                # Обходим проверку ключа API
-                temp_marketplace.client_claude = None
-                temp_marketplace.client_openai = None
-                questions = temp_marketplace.load_questions(questions_file)
-                st.session_state.questions = questions
-                st.success(f"Загружено {len(questions)} вопросов")
-            except Exception as e:
-                st.error(f"Ошибка при загрузке вопросов: {str(e)}")
-                st.session_state.questions = None
+        try:
+            # Создаем временный экземпляр маркетплейса для загрузки вопросов,
+            # используя текущие API ключи из интерфейса
+            temp_marketplace = RespondentsMarketplace(
+                api_key_claude=api_key_claude,
+                api_key_openai=api_key_openai if api_key_openai else None
+            )
+            questions = temp_marketplace.load_questions(questions_file)
+            st.session_state.questions = questions
+            st.success(f"Загружено {len(questions)} вопросов")
+        except Exception as e:
+            st.error(f"Ошибка при загрузке вопросов: {str(e)}")
+            st.session_state.questions = None
 
         # Файл с отзывами о банках (опционально)
         reviews_file = st.file_uploader(
