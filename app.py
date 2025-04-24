@@ -4656,11 +4656,11 @@ def display_results(results):
         st.dataframe(literacy_df)
 
 def main():
-    st.set_page_config(page_title="Synthetica Financial: Симулятор финансовых респондентов",
-                      page_icon="💰", layout="wide", initial_sidebar_state="expanded")
+    #st.set_page_config(page_title="Synthetica Financial: cимулятор финансовых респондентов",
+                      #page_icon="💰", layout="wide", initial_sidebar_state="expanded")
 
     # Заголовок и описание
-    st.title("Synthetica Financial: Симулятор финансовых респондентов")
+    st.title("Synthetica Financial: cимулятор финансовых респондентов")
     st.markdown("Генерация реалистичных ответов респондентов с разным уровнем финансовой грамотности")
 
     # Инициализация переменных сессии
