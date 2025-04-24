@@ -28,8 +28,8 @@ warnings.filterwarnings('ignore')
 
 # Заголовок приложения
 st.set_page_config(page_title="Synthetica Financial: Симулятор финансовых респондентов", layout="wide")
-st.title("Synthetica Financial: Симулятор финансовых респондентов")
-st.caption("Генерация реалистичных ответов респондентов с разным уровнем финансовой грамотности")
+#st.title("Synthetica Financial: Симулятор финансовых респондентов")
+#st.caption("Генерация реалистичных ответов респондентов с разным уровнем финансовой грамотности")
 
 # Загрузка необходимых ресурсов NLTK
 @st.cache_resource
