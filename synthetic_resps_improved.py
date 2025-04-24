@@ -16,7 +16,7 @@ Original file is located at
 """
 
 # Установка необходимых библиотек
-!pip install -q anthropic openai pandas openpyxl ipywidgets tqdm seaborn scikit-learn nltk spacy
+#!pip install -q anthropic openai pandas openpyxl ipywidgets tqdm seaborn scikit-learn nltk spacy
 
 # Импорт библиотек
 import os
