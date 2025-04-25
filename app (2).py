@@ -1,3 +1,12 @@
+import streamlit as st
+
+# Настройка страницы должна быть ПЕРВОЙ командой Streamlit
+st.set_page_config(
+    page_title="Synthetica Financial: Симулятор финансовых респондентов",
+    page_icon="💰", 
+    layout="wide", 
+    initial_sidebar_state="expanded"
+)
 # -*- coding: utf-8 -*-
 """app.ipynb
 
@@ -25,7 +34,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from typing import List, Dict, Any, Optional, Tuple, Union, Set
 from datetime import datetime
-import streamlit as st
 import anthropic
 import openai
 from tqdm import tqdm
@@ -39,14 +47,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
 import warnings
 warnings.filterwarnings('ignore')
-
-# Настройка страницы Streamlit - ОБЯЗАТЕЛЬНО в начале после импортов
-st.set_page_config(
-    page_title="Synthetica Financial: Симулятор финансовых респондентов",
-    page_icon="💰",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
 
 # Загрузка необходимых ресурсов NLTK
 #@st.cache_resource
