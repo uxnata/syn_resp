@@ -1,4 +1,21 @@
 import streamlit as st
+import pkg_resources
+
+# Проверка версии Streamlit
+streamlit_version = pkg_resources.get_distribution("streamlit").version
+print(f"Текущая версия Streamlit: {streamlit_version}")
+
+# Определяем правильный метод перезапуска в зависимости от версии
+def safe_rerun():
+    try:
+        st.rerun()
+    except AttributeError:
+        try:
+            st.experimental_rerun()
+        except AttributeError:
+            st.warning("Невозможно выполнить rerun в данной версии Streamlit")
+
+# Используйте safe_rerun() вместо прямого вызова st.rerun() или st.experimental_rerun()
 
 # Настройка страницы должна быть ПЕРВОЙ командой Streamlit
 st.set_page_config(
@@ -20,6 +37,24 @@ Original file is located at
 """
 Synthetica Financial
 """
+
+def ensure_nltk_resources():
+    """Гарантирует наличие всех необходимых ресурсов NLTK"""
+    resources = [
+        ('punkt', 'tokenizers/punkt'),
+        ('stopwords', 'corpora/stopwords')
+    ]
+    
+    for resource, path in resources:
+        try:
+            nltk.data.find(path)
+            print(f"Ресурс {resource} найден")
+        except LookupError:
+            print(f"Загрузка ресурса {resource}...")
+            nltk.download(resource, quiet=True)
+
+# Вызовите эту функцию в начале программы
+ensure_nltk_resources()
 
 import os
 import json
@@ -51,26 +86,22 @@ warnings.filterwarnings('ignore')
 # Загрузка необходимых ресурсов NLTK
 @st.cache_resource
 def load_nltk_resources():
+    """Загрузка необходимых ресурсов NLTK"""
+    # Загружаем базовый punkt (без указания языка)
     try:
         nltk.data.find('tokenizers/punkt')
     except LookupError:
         nltk.download('punkt', quiet=True)
-
+    
+    # Загружаем стоп-слова (в том числе русские)
     try:
         nltk.data.find('corpora/stopwords')
     except LookupError:
         nltk.download('stopwords', quiet=True)
+    
     # Проверяем наличие русских стоп-слов
     if 'russian' not in stopwords.available_languages():
         nltk.download('stopwords', quiet=True)
-    
-    # Проверяем работу с русским текстом
-    try:
-        test_text = "Проверка работы токенизатора."
-        tokens = word_tokenize(test_text, language='russian')
-    except Exception as e:
-        print(f"Ошибка токенизации: {str(e)}")
-        nltk.download('punkt', quiet=True)
         
 # Вызываем загрузку ресурсов
 load_nltk_resources()
@@ -199,7 +230,7 @@ class BankReviewsAnalyzer:
             try:
                 # Получение частотности терминов для всех отзывов
                 all_texts = ' '.join(self.reviews_data['text'].fillna('').astype(str).tolist())
-                all_words = [word.lower() for word in word_tokenize(all_texts, language='russian')
+                all_words = [word.lower() for word in word_tokenize(all_texts)
                            if word.isalpha() and word.lower() not in self.russian_stopwords and len(word) > 2]
 
                 word_freq = Counter(all_words)
@@ -4377,9 +4408,22 @@ def display_persona_editor(persona_id, marketplace, initial_persona=None):
     Returns:
         Словарь с данными персоны
     """
+    # Ключи для хранения состояния в session_state
+    persona_key = f"persona_state_{persona_id}"
+    randomize_key = f"randomize_clicked_{persona_id}"
+    
+    # Инициализация состояния кнопки рандомизации
+    if randomize_key not in st.session_state:
+        st.session_state[randomize_key] = False
+    
+    # Обработка начального состояния персоны
     if initial_persona is None:
-        initial_persona = marketplace.generate_persona()
-
+        if persona_key in st.session_state:
+            initial_persona = st.session_state[persona_key]
+        else:
+            initial_persona = marketplace.generate_persona()
+            st.session_state[persona_key] = initial_persona
+    
     st.markdown(f"### Респондент #{persona_id}")
 
     cols_main = st.columns(2)
@@ -4549,8 +4593,13 @@ def display_persona_editor(persona_id, marketplace, initial_persona=None):
                 key=f"behavior_{persona_id}"
             )
 
-    if st.button("🎲 Случайные значения", key=f"randomize_{persona_id}"):
-        st.rerun()  # Используем rerun для обновления с новыми значениями
+    # Новая обработка кнопки "Случайные значения" без использования rerun
+    if st.button("🎲 Случайные значения", key=f"randomize_button_{persona_id}"):
+        # Создаем новую персону и сохраняем её в session_state
+        st.session_state[persona_key] = marketplace.generate_persona()
+        st.session_state[randomize_key] = True
+        # Возвращаем новую персону, чтобы не нужно было делать rerun
+        return st.session_state[persona_key]
 
     # Собираем данные персоны
     persona = {
@@ -4598,6 +4647,9 @@ def display_persona_editor(persona_id, marketplace, initial_persona=None):
 
     # Применяем расширение через EnhancedFinancialRespondent
     enhanced_persona = marketplace.enhanced_respondent.enhance_persona(persona)
+    
+    # Сохраняем финальную версию персоны в session_state
+    st.session_state[persona_key] = enhanced_persona
 
     return enhanced_persona
 
