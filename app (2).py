@@ -49,7 +49,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # Загрузка необходимых ресурсов NLTK
-#@st.cache_resource
+@st.cache_resource
 def load_nltk_resources():
     try:
         nltk.data.find('tokenizers/punkt')
