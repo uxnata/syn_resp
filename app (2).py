@@ -25,23 +25,31 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ВАЖНО: Сначала импортируем nltk, затем определяем функцию ensure_nltk_resources
 import nltk
 
-def ensure_nltk_resources():
-    """Гарантирует наличие всех необходимых ресурсов NLTK"""
-    resources = [
-        ('punkt', 'tokenizers/punkt'),
-        ('stopwords', 'corpora/stopwords')
-    ]
+# Явно скачиваем нужные ресурсы NLTK
+nltk.download('punkt', quiet=True)
+nltk.download('stopwords', quiet=True)
+
+# Исправленная функция для загрузки ресурсов
+@st.cache_resource
+def load_nltk_resources():
+    """Загрузка необходимых ресурсов NLTK"""
+    # Загружаем базовый punkt (без указания языка)
+    try:
+        nltk.data.find('tokenizers/punkt')
+    except LookupError:
+        nltk.download('punkt', quiet=True)
     
-    for resource, path in resources:
-        try:
-            nltk.data.find(path)
-            print(f"Ресурс {resource} найден")
-        except LookupError:
-            print(f"Загрузка ресурса {resource}...")
-            nltk.download(resource, quiet=True)
+    # Загружаем стоп-слова (в том числе русские)
+    try:
+        nltk.data.find('corpora/stopwords')
+    except LookupError:
+        nltk.download('stopwords', quiet=True)
+    
+    # Проверяем наличие русских стоп-слов
+    if 'russian' not in stopwords.fileids():
+        nltk.download('stopwords', quiet=True)
 
 # Теперь вызываем функцию после определения и импорта nltk
 ensure_nltk_resources()
@@ -4399,14 +4407,20 @@ def display_persona_editor(persona_id, marketplace, initial_persona=None):
     """
     # Ключи для хранения состояния в session_state
     persona_key = f"persona_state_{persona_id}"
-    randomize_key = f"randomize_clicked_{persona_id}"
+    randomize_key = f"randomize_{persona_id}"
     
-    # Инициализация состояния кнопки рандомизации
+    # Инициализация состояния для кнопки рандомизации
     if randomize_key not in st.session_state:
         st.session_state[randomize_key] = False
     
+    # Обработка состояния кнопки рандомизации
+    if st.session_state.get(randomize_key):
+        # Генерируем новую персону, если кнопка была нажата
+        initial_persona = marketplace.generate_persona()
+        st.session_state[persona_key] = initial_persona
+        st.session_state[randomize_key] = False
     # Обработка начального состояния персоны
-    if initial_persona is None:
+    elif initial_persona is None:
         if persona_key in st.session_state:
             initial_persona = st.session_state[persona_key]
         else:
@@ -4582,12 +4596,11 @@ def display_persona_editor(persona_id, marketplace, initial_persona=None):
                 key=f"behavior_{persona_id}"
             )
 
-    # Новая обработка кнопки "Случайные значения" без использования rerun
+    # Кнопка для генерации случайных значений с использованием session_state
     if st.button("🎲 Случайные значения", key=f"randomize_button_{persona_id}"):
-        # Создаем новую персону и сохраняем её в session_state
-        st.session_state[persona_key] = marketplace.generate_persona()
+        # Устанавливаем флаг в session_state, что нужно сгенерировать новую персону
         st.session_state[randomize_key] = True
-        # Возвращаем новую персону, чтобы не нужно было делать rerun
+        # Возвращаем текущую персону, новая будет создана при следующей перерисовке
         return st.session_state[persona_key]
 
     # Собираем данные персоны
