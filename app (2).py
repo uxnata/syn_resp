@@ -4539,7 +4539,7 @@ def display_persona_editor(persona_id, marketplace, initial_persona=None):
             )
 
     if st.button("🎲 Случайные значения", key=f"randomize_{persona_id}"):
-        st.experimental_rerun()  # Используем rerun для обновления с новыми значениями
+        st.rerun()  # Используем rerun для обновления с новыми значениями
 
     # Собираем данные персоны
     persona = {
