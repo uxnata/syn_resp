@@ -73,7 +73,6 @@ from sklearn.decomposition import LatentDirichletAllocation
 import warnings
 warnings.filterwarnings('ignore')
 
-# Загрузка необходимых ресурсов NLTK
 @st.cache_resource
 def load_nltk_resources():
     """Загрузка необходимых ресурсов NLTK"""
@@ -90,7 +89,7 @@ def load_nltk_resources():
         nltk.download('stopwords', quiet=True)
     
     # Проверяем наличие русских стоп-слов
-    if 'russian' not in stopwords.available_languages():
+    if 'russian' not in stopwords.fileids():  # Изменено с available_languages() на fileids()
         nltk.download('stopwords', quiet=True)
         
 # Вызываем загрузку ресурсов
