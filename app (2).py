@@ -1,5 +1,6 @@
 import streamlit as st
 import pkg_resources
+import nltk
 
 # Проверка версии Streamlit
 streamlit_version = pkg_resources.get_distribution("streamlit").version
@@ -15,8 +16,6 @@ def safe_rerun():
         except AttributeError:
             st.warning("Невозможно выполнить rerun в данной версии Streamlit")
 
-# Используйте safe_rerun() вместо прямого вызова st.rerun() или st.experimental_rerun()
-
 # Настройка страницы должна быть ПЕРВОЙ командой Streamlit
 st.set_page_config(
     page_title="Synthetica Financial: Симулятор финансовых респондентов",
@@ -25,13 +24,26 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-import nltk
+# СНАЧАЛА определяем функцию ensure_nltk_resources
+def ensure_nltk_resources():
+    """Гарантирует наличие всех необходимых ресурсов NLTK"""
+    resources = [
+        ('punkt', 'tokenizers/punkt'),
+        ('stopwords', 'corpora/stopwords')
+    ]
+    
+    for resource, path in resources:
+        try:
+            nltk.data.find(path)
+            print(f"Ресурс {resource} найден")
+        except LookupError:
+            print(f"Загрузка ресурса {resource}...")
+            nltk.download(resource, quiet=True)
 
-# Явно скачиваем нужные ресурсы NLTK
-nltk.download('punkt', quiet=True)
-nltk.download('stopwords', quiet=True)
+# ЗАТЕМ вызываем функцию
+ensure_nltk_resources()
 
-# Исправленная функция для загрузки ресурсов
+# Загрузка необходимых ресурсов NLTK
 @st.cache_resource
 def load_nltk_resources():
     """Загрузка необходимых ресурсов NLTK"""
@@ -48,7 +60,7 @@ def load_nltk_resources():
         nltk.download('stopwords', quiet=True)
     
     # Проверяем наличие русских стоп-слов
-    if 'russian' not in stopwords.fileids():
+    if 'russian' not in stopwords.fileids():  # Изменено с available_languages() на fileids()
         nltk.download('stopwords', quiet=True)
 
 # Теперь вызываем функцию после определения и импорта nltk
