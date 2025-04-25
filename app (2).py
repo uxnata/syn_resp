@@ -60,7 +60,18 @@ def load_nltk_resources():
         nltk.data.find('corpora/stopwords')
     except LookupError:
         nltk.download('stopwords', quiet=True)
-
+    # Проверяем наличие русских стоп-слов
+    if 'russian' not in stopwords.available_languages():
+        nltk.download('stopwords', quiet=True)
+    
+    # Проверяем работу с русским текстом
+    try:
+        test_text = "Проверка работы токенизатора."
+        tokens = word_tokenize(test_text, language='russian')
+    except Exception as e:
+        print(f"Ошибка токенизации: {str(e)}")
+        nltk.download('punkt', quiet=True)
+        
 # Вызываем загрузку ресурсов
 load_nltk_resources()
 
@@ -4784,7 +4795,7 @@ def main():
                 config = load_saved_config()
                 if config:
                     st.success("Настройки загружены")
-                    st.experimental_rerun()
+                    st.rerun()
                 else:
                     st.warning("Сохраненные настройки не найдены")
 
@@ -4843,7 +4854,7 @@ def main():
                             st.session_state.results = results
                             st.session_state.download_data = download_data
                             st.session_state.show_results = True
-                            st.experimental_rerun()
+                            st.rerun()
                         except Exception as e:
                             st.error(f"Ошибка при генерации: {str(e)}")
         else:
@@ -4863,7 +4874,7 @@ def main():
             # Кнопка для возврата к настройкам
             if st.button("Вернуться к настройкам"):
                 st.session_state.show_results = False
-                st.experimental_rerun()
+                st.rerun()
     else:
         # Информация о форматах файлов
         st.header("Информация о форматах файлов")
