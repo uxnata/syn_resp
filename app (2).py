@@ -2,11 +2,9 @@ import streamlit as st
 import pkg_resources
 import nltk
 
-# Проверка версии Streamlit
 streamlit_version = pkg_resources.get_distribution("streamlit").version
 print(f"Текущая версия Streamlit: {streamlit_version}")
 
-# Определяем правильный метод перезапуска в зависимости от версии
 def safe_rerun():
     try:
         st.rerun()
@@ -16,15 +14,13 @@ def safe_rerun():
         except AttributeError:
             st.warning("Невозможно выполнить rerun в данной версии Streamlit")
 
-# Настройка страницы должна быть ПЕРВОЙ командой Streamlit
 st.set_page_config(
     page_title="Synthetica Financial: Симулятор финансовых респондентов",
-    page_icon="💰", 
+    page_icon="", 
     layout="wide", 
     initial_sidebar_state="expanded"
 )
 
-# СНАЧАЛА определяем функцию ensure_nltk_resources
 def ensure_nltk_resources():
     """Гарантирует наличие всех необходимых ресурсов NLTK"""
     resources = [
@@ -40,33 +36,26 @@ def ensure_nltk_resources():
             print(f"Загрузка ресурса {resource}...")
             nltk.download(resource, quiet=True)
 
-# ЗАТЕМ вызываем функцию
 ensure_nltk_resources()
 
-# Загрузка необходимых ресурсов NLTK
 @st.cache_resource
 def load_nltk_resources():
     """Загрузка необходимых ресурсов NLTK"""
-    # Загружаем базовый punkt (без указания языка)
     try:
         nltk.data.find('tokenizers/punkt')
     except LookupError:
         nltk.download('punkt', quiet=True)
     
-    # Загружаем стоп-слова (в том числе русские)
     try:
         nltk.data.find('corpora/stopwords')
     except LookupError:
         nltk.download('stopwords', quiet=True)
     
-    # Проверяем наличие русских стоп-слов
-    if 'russian' not in stopwords.fileids():  # Изменено с available_languages() на fileids()
+    if 'russian' not in stopwords.fileids():  
         nltk.download('stopwords', quiet=True)
 
-# Теперь вызываем функцию после определения и импорта nltk
 ensure_nltk_resources()
 
-# Остальные импорты
 import os
 import json
 import random
@@ -102,20 +91,16 @@ def load_nltk_resources():
     except LookupError:
         nltk.download('punkt', quiet=True)
     
-    # Загружаем стоп-слова (в том числе русские)
     try:
         nltk.data.find('corpora/stopwords')
     except LookupError:
         nltk.download('stopwords', quiet=True)
     
-    # Проверяем наличие русских стоп-слов
     if 'russian' not in stopwords.fileids():  # Изменено с available_languages() на fileids()
         nltk.download('stopwords', quiet=True)
         
-# Вызываем загрузку ресурсов
 load_nltk_resources()
 
-# Класс для сериализации numpy типов в JSON
 class NumpyEncoder(json.JSONEncoder):
     """Специальный класс для сериализации numpy типов в JSON"""
     def default(self, obj):
@@ -154,10 +139,6 @@ class BankReviewsAnalyzer:
         try:
             self.reviews_data = pd.read_excel(file_data)
             st.success(f"Загружено {len(self.reviews_data)} отзывов")
-
-            # Проверка и нормализация колонок для формата:
-            # rating - оценка, theme - тема, review - отзыв, categorie - категория
-            column_mapping = {}
 
             # Маппинг review колонки
             if 'review' in self.reviews_data.columns:
